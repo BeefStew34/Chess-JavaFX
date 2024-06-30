@@ -25,8 +25,8 @@ public class Piece extends Text{
         this.setY(((position.y+1)*scale)-(0.25*scale));
         this.setOnMouseClicked(e -> Click());
 
-        this.setStrokeWidth(1);
-        this.setStroke(kp);
+        //this.setStrokeWidth(1);
+        //this.setStroke(kp);
         this.setFill(pk);
 
         this.isWhite = isWhite;

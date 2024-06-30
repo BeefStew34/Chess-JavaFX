@@ -49,15 +49,18 @@ public class Board{
 
                 _sections[x][y].setOnMouseClicked(e -> SquareClickProxy(finalX, finalY));
                 if((x+y) % 2 == 0)
-                    _sections[x][y].setFill(Color.BLACK);
+                    _sections[x][y].setFill(Color.rgb(100,96,91));
                 else
-                    _sections[x][y].setFill(Color.CORNSILK);
+                    _sections[x][y].setFill(Color.rgb(192,184,160));
             }
         }
         
     }
     private void SquareClickProxy(int x, int y){
-        if(_pieces[x][y] == null){
+	if(points == null)
+		return;
+        if(_pieces[x][y] == null)
+	{
             for(int i = 0; i < points.size(); i++){
                 if(points.get(i).x == x && points.get(i).y == y && _selected != null)
                     MovePiece(points.get(i), _selected);
