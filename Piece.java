@@ -12,7 +12,7 @@ public class Piece extends Text{
     public Point position;
     public boolean fresh = true;
     private int scale;
-    private Board _parent;
+    public Board _parent;
 
     public Piece(String letter, Boolean isWhite, Point position, Board parent){
         this.setText(letter);

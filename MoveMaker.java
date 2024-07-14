@@ -1,4 +1,11 @@
 import java.util.ArrayList;
+enum CheckType{
+    NONE,
+    BLACKCHECK,
+    WHITECHECK,
+    BLACKMATE,
+    WHITEMATE;
+}
 
 public final class MoveMaker{
     private MoveMaker(){
@@ -7,6 +14,10 @@ public final class MoveMaker{
     public static ArrayList<Point> moves(Point size, Piece[][] board, Piece subject){
         char type = subject.getText().charAt(0);
         //System.out.println("GetMoves");
+        if(subject._parent.check){
+            System.out.println("Moves Limited By Check");
+        }
+
         switch(type){
             case 'R':
                 return rookMoves(size, board, subject);
@@ -201,5 +212,38 @@ public final class MoveMaker{
         output.addAll(kingMoves(size,board,subject));
 
         return output;
+    }
+
+    public static CheckType isCheck(Point size, Piece[][] board){
+        Point bKingPos = null;
+        Point wKingPos = null;
+        for(int x = 0; x < size.x; x++){
+            for(int y = 0; y < size.y; y++){
+                if(board[x][y] == null || board[x][y].getText().charAt(0) != 'O')
+                    continue;
+                if(board[x][y].isWhite)
+                    wKingPos = new Point(x,y);
+                else
+                    bKingPos = new Point(x,y);
+                if(bKingPos != null && wKingPos != null)
+                    break; 
+            }
+        }
+
+        for(int x = 0; x < size.x; x++){
+            for(int y = 0; y < size.y; y++){
+                if(board[x][y] == null)
+                    continue;
+                ArrayList<Point> mvs = moves(size, board, board[x][y]);
+
+                for(int i = 0; i < mvs.size(); i++){
+                    if(mvs.get(i).x == bKingPos.x && mvs.get(i).y == bKingPos.y)
+                        return CheckType.BLACKCHECK;
+                    if(mvs.get(i).x == wKingPos.x && mvs.get(i).y == wKingPos.y)
+                        return CheckType.WHITECHECK;
+                }
+            }
+        }
+        return CheckType.NONE;
     }
 }

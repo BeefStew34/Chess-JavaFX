@@ -15,52 +15,51 @@ public class Board{
     private boolean isWhiteTurn = true;
     public ArrayList<Point> points;
     private Piece _selected;
+    public boolean check;
 
     public Group getParent(){
         return _parent;
     }
-
-    public Board(int sizeX, int sizeY, int scale, Group parent, Group overlay){
-        _sizeX = sizeX;
-        _sizeY = sizeY;
-        _overlay = overlay;
+    public void Reset(){
+        _parent.getChildren().clear();
+        _overlay.getChildren().clear();
         size = new Point(_sizeX, _sizeY);
-        _parent = parent;
-        _sections = new Rectangle[sizeX][sizeY];
-        this.scale = scale*10;
+        _sections = new Rectangle[size.x][size.y];
         _pieces = initializePieces(scale*10);
         
-        /*for(int j = 0; j < 2; j++)
-            for(int i = 0; i < 8; i++)
-                _parent.getChildren().add(_pieces[i][j]);
-        for(int j = 6; j < 8; j++)
-            for(int i = 0; i < 8; i++)
-                _parent.getChildren().add(_pieces[i][j]);*/
-        
-        for(int x = 0; x < sizeX; x++){
-            for(int y = 0; y < sizeY; y++){
+        for(int x = 0; x < size.x; x++){
+            for(int y = 0; y < size.y; y++){
                 final int finalX = x;
                 final int finalY = y;
                 _sections[x][y] = new Rectangle();
-                _sections[x][y].setWidth(scale*10);
-                _sections[x][y].setHeight(scale*10);
-                _sections[x][y].setX(x*(scale*10));
-                _sections[x][y].setY(y*(scale*10));
+                _sections[x][y].setWidth(scale);
+                _sections[x][y].setHeight(scale);
+                _sections[x][y].setX(x*(scale));
+                _sections[x][y].setY(y*(scale));
 
                 _sections[x][y].setOnMouseClicked(e -> SquareClickProxy(finalX, finalY));
                 if((x+y) % 2 == 0)
                     _sections[x][y].setFill(Color.rgb(100,96,91));
                 else
                     _sections[x][y].setFill(Color.rgb(192,184,160));
+                //_parent.getChildren().add(_sections[x][y]);
             }
         }
         
     }
+    public Board(int sizeX, int sizeY, int scale, Group parent, Group overlay){
+        _sizeX = sizeX;
+        _sizeY = sizeY;
+        _overlay = overlay;
+        this.scale = scale*10;
+        _parent = parent;
+        Reset();
+    }
     private void SquareClickProxy(int x, int y){
-	if(points == null)
-		return;
+	    if(points == null)
+		    return;
         if(_pieces[x][y] == null)
-	{
+	    {
             for(int i = 0; i < points.size(); i++){
                 if(points.get(i).x == x && points.get(i).y == y && _selected != null)
                     MovePiece(points.get(i), _selected);
@@ -100,7 +99,6 @@ public class Board{
         output[4][0] = new Piece("O", false, new Point(4, 0), this);
         output[3][7] = new Piece("Q", true, new Point(3, 7), this);
         output[4][7] = new Piece("O", true, new Point(4, 7), this);
-
         return output;
     }
     public void render(Group ui){
@@ -119,6 +117,18 @@ public class Board{
         if(points == null)
             return;
         for(int i = 0; i < points.size(); i++){
+            _pieces[subject.position.x][subject.position.y] = null;
+            Piece swap = _pieces[points.get(i).x][points.get(i).y];
+            _pieces[points.get(i).x][points.get(i).y] = subject;
+            CheckType ct = MoveMaker.isCheck(size, _pieces);
+            _pieces[points.get(i).x][points.get(i).y] = swap;
+            _pieces[subject.position.x][subject.position.y] = subject;
+
+            if((ct == CheckType.WHITECHECK || ct == CheckType.WHITEMATE) && subject.isWhite)
+                continue;
+            if((ct == CheckType.BLACKCHECK || ct == CheckType.BLACKMATE) && !subject.isWhite)
+                continue;
+
             Circle option = new Circle();
             //System.out.println(points.get(i).x*scale + " " + points.get(i).y*scale);
             option.setCenterX((points.get(i).x*scale)+(0.5*scale));
@@ -141,5 +151,15 @@ public class Board{
         subject.setX((subject.position.x*scale)+(0.25*scale));
         subject.setY(((subject.position.y+1)*scale)-(0.25*scale));
         _overlay.getChildren().clear();
+
+        /*ArrayList<Point> checkCheck = MoveMaker.moves(size, _pieces, subject);
+        if(checkCheck == null)
+            return;
+
+        for(int i = 0; i < checkCheck.size(); i++){
+            Piece checkSubject = _pieces[checkCheck.get(i).x][checkCheck.get(i).y];
+            if(checkSubject != null && checkSubject.getText().charAt(0) == 'O' && checkSubject.isWhite != subject.isWhite)
+                System.out.println("CHECK!!!!");
+        }*/
     }
 }
