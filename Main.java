@@ -10,7 +10,8 @@ import java.net.InetAddress;
 import javafx.scene.text.Text;
 
 public class Main extends Application{
-    @Override
+	public Text msgOverlay;
+	@Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         
@@ -21,7 +22,7 @@ public class Main extends Application{
         TextField ip = new TextField("xxx.xxx.xxx.xxx:xxxx");
         Button connect = new Button("Connect");
         Button host = new Button("Host Server");
-        Text msgOverlay = new Text("");
+        msgOverlay = new Text("");
 
         ui.getChildren().add(reset);
         ui.getChildren().add(ip);
@@ -49,21 +50,12 @@ public class Main extends Application{
         connect.setTranslateY(offset);
         offset += connect.getHeight();
         host.setTranslateY(offset);
+	 
 
+	NetHost nh = new NetHost(this);
         host.setOnAction(e -> {
-            int port = 4444;
-            int connectionsCount = 0;
-            connect.setDisable(true);
-            msgOverlay.setText("Waiting for Connection...");
-            try{
-                ServerSocket serverSocket = new ServerSocket(port);
-                Socket clientSocket = serverSocket.accept();
-            }
-            catch(Exception except){
-                connect.setDisable(false);
-                System.out.println(except);
-            }
-        });
+		nh.start();
+	});
     }
     public static void main(String[] args) {
         Application.launch(args);
