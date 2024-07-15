@@ -119,7 +119,6 @@ public class Board{
         _overlay.getChildren().clear();
         if(points == null)
             return;
-        System.out.println(points.size());
         for(int i = 0; i < points.size(); i++){
             _pieces[subject.position.x][subject.position.y] = null;
             Piece swap = _pieces[points.get(i).x][points.get(i).y];
@@ -134,17 +133,13 @@ public class Board{
                 continue;
 
             Circle option = new Circle();
-            //System.out.println(points.get(i).x*scale + " " + points.get(i).y*scale);
             option.setCenterX((points.get(i).x*scale)+(0.5*scale));
             option.setCenterY((points.get(i).y*scale)+(0.5*scale));
             option.setRadius(10);
             option.setFill(Color.GREEN);
-            //System.out.println(option.getTranslateZ());
-            //option.setVisible(true);
             Point p = points.get(i);
             option.setOnMouseClicked(e -> MovePiece(p, subject));
             _overlay.getChildren().add(option);
-            System.out.println("Added circle at: " + points.get(i).x + ", " + points.get(i).y);
         }
     }
     private void MovePiece(Point selected, Piece subject){
