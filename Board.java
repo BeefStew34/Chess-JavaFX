@@ -21,11 +21,15 @@ public class Board{
         return _parent;
     }
     public void Reset(){
-        _parent.getChildren().clear();
         _overlay.getChildren().clear();
+        _parent.getChildren().clear();
+        _parent.getChildren().add(_overlay);
         size = new Point(_sizeX, _sizeY);
         _sections = new Rectangle[size.x][size.y];
-        _pieces = initializePieces(scale*10);
+        _selected = null;
+        isWhiteTurn = true;
+        check = false;
+        points = null;
         
         for(int x = 0; x < size.x; x++){
             for(int y = 0; y < size.y; y++){
@@ -38,14 +42,13 @@ public class Board{
                 _sections[x][y].setY(y*(scale));
 
                 _sections[x][y].setOnMouseClicked(e -> SquareClickProxy(finalX, finalY));
-                if((x+y) % 2 == 0)
-                    _sections[x][y].setFill(Color.rgb(100,96,91));
-                else
-                    _sections[x][y].setFill(Color.rgb(192,184,160));
+                _sections[x][y].setFill((x+y) % 2 == 0 ? Color.rgb(100,96,91) : Color.rgb(192,184,160));
                 //_parent.getChildren().add(_sections[x][y]);
             }
         }
-        
+        render(_parent);
+        _pieces = initializePieces(scale*10);
+
     }
     public Board(int sizeX, int sizeY, int scale, Group parent, Group overlay){
         _sizeX = sizeX;
@@ -58,15 +61,16 @@ public class Board{
     private void SquareClickProxy(int x, int y){
 	    if(points == null)
 		    return;
-        if(_pieces[x][y] == null)
-	    {
+        if(_pieces[x][y] == null){
             for(int i = 0; i < points.size(); i++){
-                if(points.get(i).x == x && points.get(i).y == y && _selected != null)
+                if(points.get(i).x == x && points.get(i).y == y && _selected != null){
                     MovePiece(points.get(i), _selected);
+                    return;
+                }
             }
+            return;
         }
-        else
-            _pieces[x][y].Click();
+        _pieces[x][y].Click();
     }
     private Piece[][] initializePieces(int scale){
         Piece[][] output = new Piece[_sizeX][_sizeY];
@@ -112,10 +116,10 @@ public class Board{
 
         if(subject.isWhite != isWhiteTurn)
             return;
-        
         _overlay.getChildren().clear();
         if(points == null)
             return;
+        System.out.println(points.size());
         for(int i = 0; i < points.size(); i++){
             _pieces[subject.position.x][subject.position.y] = null;
             Piece swap = _pieces[points.get(i).x][points.get(i).y];
@@ -135,9 +139,12 @@ public class Board{
             option.setCenterY((points.get(i).y*scale)+(0.5*scale));
             option.setRadius(10);
             option.setFill(Color.GREEN);
+            //System.out.println(option.getTranslateZ());
+            //option.setVisible(true);
             Point p = points.get(i);
             option.setOnMouseClicked(e -> MovePiece(p, subject));
             _overlay.getChildren().add(option);
+            System.out.println("Added circle at: " + points.get(i).x + ", " + points.get(i).y);
         }
     }
     private void MovePiece(Point selected, Piece subject){
@@ -151,15 +158,5 @@ public class Board{
         subject.setX((subject.position.x*scale)+(0.25*scale));
         subject.setY(((subject.position.y+1)*scale)-(0.25*scale));
         _overlay.getChildren().clear();
-
-        /*ArrayList<Point> checkCheck = MoveMaker.moves(size, _pieces, subject);
-        if(checkCheck == null)
-            return;
-
-        for(int i = 0; i < checkCheck.size(); i++){
-            Piece checkSubject = _pieces[checkCheck.get(i).x][checkCheck.get(i).y];
-            if(checkSubject != null && checkSubject.getText().charAt(0) == 'O' && checkSubject.isWhite != subject.isWhite)
-                System.out.println("CHECK!!!!");
-        }*/
     }
 }
