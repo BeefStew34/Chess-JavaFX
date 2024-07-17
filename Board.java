@@ -16,6 +16,7 @@ public class Board{
     public ArrayList<Point> points;
     private Piece _selected;
     public boolean check;
+    public boolean movesEnabled = true;
 
     public Group getParent(){
         return _parent;
@@ -59,6 +60,8 @@ public class Board{
         Reset();
     }
     private void SquareClickProxy(int x, int y){
+        if(!movesEnabled)
+            return;
 	    if(points == null)
 		    return;
         if(_pieces[x][y] == null){
@@ -111,6 +114,8 @@ public class Board{
                 ui.getChildren().add(0,_sections[x][y]);
     }
     public void PieceClick(Piece subject){
+        if(!movesEnabled)
+            return;
         points = MoveMaker.moves(size, _pieces, subject);
         _selected = subject;
 
@@ -143,6 +148,8 @@ public class Board{
         }
     }
     private void MovePiece(Point selected, Piece subject){
+        if(!movesEnabled)
+            return;
         if(_pieces[selected.x][selected.y] != null)
             _parent.getChildren().remove(_pieces[selected.x][selected.y]);
         isWhiteTurn = !isWhiteTurn;

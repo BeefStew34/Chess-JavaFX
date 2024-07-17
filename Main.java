@@ -11,6 +11,8 @@ import javafx.scene.text.Text;
 
 public class Main extends Application{
 	public Text msgOverlay;
+    public Board chessBoard;
+    public volatile TextField ip;
 	@Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
@@ -19,7 +21,7 @@ public class Main extends Application{
         Group overlay = new Group();
         Group ui = new Group();
         Button reset = new Button("Reset");
-        TextField ip = new TextField("xxx.xxx.xxx.xxx:xxxx");
+        ip = new TextField("xxx.xxx.xxx.xxx:xxxx");
         Button connect = new Button("Connect");
         Button host = new Button("Host Server");
         msgOverlay = new Text("");
@@ -29,9 +31,12 @@ public class Main extends Application{
         ui.getChildren().add(connect);
         ui.getChildren().add(host);
 
-        Board chessBoard = new Board(8,8,7, game, overlay);
+        this.chessBoard = new Board(8,8,7, game, overlay);
 
         reset.setOnAction(e -> chessBoard.Reset());
+        connect.setOnAction(e -> {
+
+        });
         root.setCenter(game);
         root.setLeft(ui);
         root.setTop(msgOverlay);
@@ -52,10 +57,14 @@ public class Main extends Application{
         host.setTranslateY(offset);
 	 
 
-	NetHost nh = new NetHost(this);
+        NetHost nh = new NetHost(this);
         host.setOnAction(e -> {
-		nh.start();
-	});
+            nh.start();
+        });
+        NetClient nc = new NetClient(this);
+        /*connect.setOnAction(e -> {
+            nc.start();
+        });*/
     }
     public static void main(String[] args) {
         Application.launch(args);
