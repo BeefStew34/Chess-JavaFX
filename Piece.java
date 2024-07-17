@@ -30,7 +30,7 @@ public class Piece extends Text{
         this.setFill(pk);
 
         this.isWhite = isWhite;
-        this.position = position;
+        this.position = position;;
         
         this._parent = parent;
         
