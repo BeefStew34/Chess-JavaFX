@@ -49,7 +49,7 @@ public class Board{
         }
         render(_parent);
         _pieces = initializePieces(scale*10);
-
+        _overlay.toFront();
     }
     public Board(int sizeX, int sizeY, int scale, Group parent, Group overlay){
         _sizeX = sizeX;
@@ -60,11 +60,10 @@ public class Board{
         Reset();
     }
     private void SquareClickProxy(int x, int y){
-        if(!movesEnabled)
+        if(!movesEnabled || points == null)
             return;
-	    if(points == null)
-		    return;
-        if(_pieces[x][y] == null){
+
+        if(_pieces[x][y] == null || (_pieces[x][y] != null && _pieces[x][y].isWhite != _selected.isWhite)){
             for(int i = 0; i < points.size(); i++){
                 if(points.get(i).x == x && points.get(i).y == y && _selected != null){
                     MovePiece(points.get(i), _selected);
@@ -147,9 +146,14 @@ public class Board{
             _overlay.getChildren().add(option);
         }
     }
-    private void MovePiece(Point selected, Piece subject){
-        if(!movesEnabled)
-            return;
+    public void NetMovePiece(byte[] buffer){
+        this.movesEnabled = true;
+        System.out.println("Move Peice x:" + buffer[0] + ", y:" + buffer[1] + " To x:" + buffer[2] + ", y:" + buffer[3]);
+        GenericMovePiece(new Point( buffer[2], buffer[3]), _pieces[buffer[0]][buffer[1]]);
+    }
+    public NetClient nc;
+    public NetHost nh;
+    private void GenericMovePiece(Point selected, Piece subject){
         if(_pieces[selected.x][selected.y] != null)
             _parent.getChildren().remove(_pieces[selected.x][selected.y]);
         isWhiteTurn = !isWhiteTurn;
@@ -159,6 +163,16 @@ public class Board{
         subject.fresh = false;
         subject.setX((subject.position.x*scale)+(0.25*scale));
         subject.setY(((subject.position.y+1)*scale)-(0.25*scale));
+    }
+    private void MovePiece(Point selected, Piece subject){
+        if(!movesEnabled)
+            return;
+        if(nc != null)
+            nc.NetMakeMove(subject.position.x, subject.position.y, selected.x, selected.y);
+        if(nh != null)
+            nh.NetMakeMove(subject.position.x, subject.position.y, selected.x, selected.y);
+
+        GenericMovePiece(selected,subject);
         _overlay.getChildren().clear();
     }
 }

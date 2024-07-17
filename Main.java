@@ -21,7 +21,7 @@ public class Main extends Application{
         Group overlay = new Group();
         Group ui = new Group();
         Button reset = new Button("Reset");
-        ip = new TextField("xxx.xxx.xxx.xxx:xxxx");
+        ip = new TextField("127.0.0.1");
         Button connect = new Button("Connect");
         Button host = new Button("Host Server");
         msgOverlay = new Text("");
@@ -34,9 +34,6 @@ public class Main extends Application{
         this.chessBoard = new Board(8,8,7, game, overlay);
 
         reset.setOnAction(e -> chessBoard.Reset());
-        connect.setOnAction(e -> {
-
-        });
         root.setCenter(game);
         root.setLeft(ui);
         root.setTop(msgOverlay);
@@ -62,9 +59,14 @@ public class Main extends Application{
             nh.start();
         });
         NetClient nc = new NetClient(this);
-        /*connect.setOnAction(e -> {
+        connect.setOnAction(e -> {
             nc.start();
-        });*/
+        });
+    }
+    public void UITimeout(boolean enabled){
+        msgOverlay.setText(!enabled ? "Waiting for Connection" : "");
+        chessBoard.Reset();
+        chessBoard.movesEnabled = enabled;
     }
     public static void main(String[] args) {
         Application.launch(args);
